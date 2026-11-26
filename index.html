@@ -1,0 +1,473 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Tidebound</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one dark sea-at-night column. Wide hero canvas, story as a numbered tide table,
+   courts as four colour-keyed columns, then the duel arena as the single loud element. */
+:root{
+  color-scheme:dark;
+  --ink:#06141b;        /* deep water */
+  --ink-2:#0c222c;      /* raised surface */
+  --line:#1d3f4d;       /* hairlines */
+  --foam:#e4f1ee;       /* text */
+  --mist:#8fb0b3;       /* secondary text */
+  --moon:#ecc766;       /* accent: moon brass */
+  --squall:#f2d24b; --rime:#8fd8f0; --abyss:#a98bf7; --cinder:#f5814a;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ink);color:var(--foam);font:400 16px/1.6 var(--body)}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:800;line-height:1.02;margin:0;text-wrap:balance}
+h2{font-size:clamp(1.9rem,5vw,3.1rem);letter-spacing:-.02em}
+p{margin:0;max-width:62ch}
+.eyebrow{font:600 .74rem/1 var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--moon)}
+section{padding-block:clamp(3rem,8vw,5.5rem)}
+.head{display:flex;flex-direction:column;gap:.9rem;margin-bottom:2rem}
+.head p{color:var(--mist)}
+
+/* hero */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+#sea{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero .wrap{position:relative;display:flex;flex-direction:column;gap:1.3rem;padding-block:clamp(4rem,13vw,8.5rem) clamp(3rem,8vw,5rem)}
+.hero h1{font-size:clamp(3.4rem,15vw,9.5rem);letter-spacing:-.045em;text-transform:uppercase}
+.hero h1 span{color:var(--moon)}
+.hero p{font-size:clamp(1rem,2.4vw,1.25rem);color:var(--foam);max-width:44ch}
+.row{display:flex;flex-wrap:wrap;gap:.75rem}
+.btn{font:600 1rem/1 var(--body);padding:.95rem 1.35rem;border:1px solid var(--line);background:var(--ink-2);color:var(--foam);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;border-radius:2px}
+.btn:hover{border-color:var(--moon)}
+.btn.primary{background:var(--moon);color:var(--ink);border-color:var(--moon)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:focus-visible,.opt:focus-visible,.pick:focus-visible,.pad button:focus-visible{outline:2px solid var(--foam);outline-offset:3px}
+
+/* story */
+.chapters{display:grid;gap:0;border-top:1px solid var(--line)}
+.chapter{display:grid;grid-template-columns:5.5rem minmax(0,1fr);gap:1rem 1.5rem;padding-block:1.6rem;border-bottom:1px solid var(--line)}
+.chapter .n{font:800 2.6rem/1 var(--display);color:var(--line)}
+.chapter h3{font-size:1.5rem;margin-bottom:.5rem}
+.chapter p{color:var(--mist)}
+@media(max-width:520px){.chapter{grid-template-columns:1fr}.chapter .n{font-size:1.6rem}}
+
+/* courts */
+.courts{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.court{background:var(--ink);padding:1.4rem 1.2rem 1.5rem;display:flex;flex-direction:column;gap:.8rem;min-width:0;border-top:4px solid var(--c)}
+.court h3{font-size:1.7rem;color:var(--c)}
+.court .sub{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mist)}
+.court p{color:var(--mist);font-size:.95rem}
+.stats{display:grid;grid-template-columns:auto 1fr;gap:.35rem .7rem;align-items:center;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mist);margin-top:auto}
+.bar{height:6px;background:var(--ink-2)}
+.bar i{display:block;height:100%;background:var(--c)}
+.court .sp{font-size:.9rem;color:var(--foam)}
+
+/* quiz */
+.quiz{border:1px solid var(--line);background:var(--ink-2);padding:clamp(1.2rem,4vw,2.2rem);display:flex;flex-direction:column;gap:1.2rem}
+.quiz .step{color:var(--mist);font-size:.82rem;letter-spacing:.14em;text-transform:uppercase}
+.quiz h3{font-size:clamp(1.3rem,3.6vw,1.9rem)}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.6rem}
+.opt{text-align:left;font:500 1rem/1.35 var(--body);padding:1rem;background:var(--ink);color:var(--foam);border:1px solid var(--line);cursor:pointer;border-radius:2px}
+.opt:hover{border-color:var(--moon)}
+.result h3{color:var(--c)}
+
+/* duel */
+.duel{background:var(--ink-2);border-block:1px solid var(--line)}
+.picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;margin-bottom:1rem}
+.pick{font:800 1.05rem/1 var(--display);padding:.95rem .8rem;background:var(--ink);color:var(--c);border:1px solid var(--line);cursor:pointer;border-radius:2px;text-align:left}
+.pick small{display:block;font:500 .72rem/1.3 var(--body);color:var(--mist);margin-top:.35rem;letter-spacing:.06em}
+.pick[aria-pressed="true"]{border-color:var(--c);box-shadow:inset 0 -4px 0 var(--c)}
+.opts-line{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;margin-bottom:1rem}
+select{font:500 1rem var(--body);padding:.8rem .9rem;background:var(--ink);color:var(--foam);border:1px solid var(--line);border-radius:2px}
+label{color:var(--mist);font-size:.9rem}
+.stage{position:relative;border:1px solid var(--line);background:#02090d}
+#arena{display:block;width:100%;aspect-ratio:16/9;max-width:100%;touch-action:none}
+.over{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;text-align:center;padding:1rem;background:rgba(3,12,17,.78)}
+.over h3{font-size:clamp(1.6rem,6vw,3.2rem);text-transform:uppercase}
+.over p{color:var(--mist)}
+.pad{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;user-select:none;-webkit-user-select:none}
+.pad>div{display:grid;gap:.5rem}
+.pad .move{grid-template-columns:repeat(3,1fr)}
+.pad .act{grid-template-columns:repeat(3,1fr)}
+.pad button{font:600 .85rem/1.1 var(--body);padding:1.05rem .3rem;background:var(--ink);color:var(--foam);border:1px solid var(--line);border-radius:2px;touch-action:none;cursor:pointer}
+.pad button.on{background:var(--moon);color:var(--ink)}
+.pad button kbd{display:block;font:500 .68rem var(--body);color:var(--mist);margin-top:.3rem}
+.pad button.on kbd{color:var(--ink)}
+.hint{color:var(--mist);font-size:.88rem;margin-top:.9rem}
+footer{padding-block:2rem;color:var(--mist);font-size:.85rem}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+
+<header class="hero">
+  <canvas id="sea" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <span class="eyebrow">A world under four broken moons</span>
+    <h1>Tide<span>bound</span></h1>
+    <p>The moon broke into four shards. Each shard pulls a different tide, and each tide has a court that fights to keep it.</p>
+    <div class="row">
+      <a class="btn primary" href="#duel">Start a duel</a>
+      <a class="btn" href="#story">Read the story</a>
+      <a class="btn" href="#quiz">Find your court</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="story"><div class="wrap">
+  <div class="head"><span class="eyebrow">The story so far</span><h2>How the sea was divided</h2></div>
+  <div class="chapters">
+    <article class="chapter"><div class="n">01</div><div><h3>The Breaking</h3><p>One night the moon cracked along four seams. The pieces drifted apart and stayed in the sky, and the sea below stopped obeying a single pull.</p></div></article>
+    <article class="chapter"><div class="n">02</div><div><h3>Four tides</h3><p>Each shard raised its own tide. The storm tide came fast and loud. The still tide froze harbours overnight. The deep tide dragged ships under. The ember tide boiled up from the vents on the sea floor.</p></div></article>
+    <article class="chapter"><div class="n">03</div><div><h3>The courts</h3><p>People who lived through a tide learned to call it. They formed four courts, built their cities on what the water left behind, and began to argue over every reef between them.</p></div></article>
+    <article class="chapter"><div class="n">04</div><div><h3>The Reef Law</h3><p>After the third war the courts agreed on one rule. A dispute is settled by two tidecallers on open reef, best of three falls, and the losing court gives up the water. You are one of those two.</p></div></article>
+  </div>
+</div></section>
+
+<section id="courts"><div class="wrap">
+  <div class="head"><span class="eyebrow">The four courts</span><h2>Pick a tide to fight for</h2><p>Every court fights differently. The bars show how each one plays in the duel.</p></div>
+  <div class="courts" id="courtCards"></div>
+</div></section>
+
+<section id="quiz"><div class="wrap">
+  <div class="head"><span class="eyebrow">Find your court</span><h2>Which tide calls you?</h2><p>Four questions. Your answers choose your fighter.</p></div>
+  <div class="quiz" id="quizBox" aria-live="polite"></div>
+</div></section>
+
+<section id="duel" class="duel"><div class="wrap">
+  <div class="head"><span class="eyebrow">The Reef Law</span><h2>Duel on the open reef</h2><p>Best of three falls. Fill your tide meter by landing and taking hits, then spend half of it on your court's special.</p></div>
+  <div class="picks" id="picks" role="group" aria-label="Choose your court"></div>
+  <div class="opts-line">
+    <label for="difficulty">Opponent</label>
+    <select id="difficulty"><option value="0">Novice</option><option value="1" selected>Reef-sworn</option><option value="2">Tide master</option></select>
+    <button class="btn primary" id="startBtn" type="button">Start duel</button>
+  </div>
+  <div class="stage">
+    <canvas id="arena" width="960" height="540" aria-label="Duel arena"></canvas>
+    <div class="over" id="over"><h3 id="overTitle">Choose a court</h3><p id="overText">Then press Start duel.</p><button class="btn primary" id="overBtn" type="button">Start duel</button></div>
+  </div>
+  <div class="pad" id="pad">
+    <div class="move">
+      <button type="button" data-k="l">Left<kbd>A</kbd></button>
+      <button type="button" data-k="up">Jump<kbd>W</kbd></button>
+      <button type="button" data-k="r">Right<kbd>D</kbd></button>
+    </div>
+    <div class="act">
+      <button type="button" data-k="light">Strike<kbd>J</kbd></button>
+      <button type="button" data-k="heavy">Heavy<kbd>K</kbd></button>
+      <button type="button" data-k="special">Tide<kbd>L</kbd></button>
+    </div>
+    <div class="move" style="grid-column:1/-1;grid-template-columns:1fr"><button type="button" data-k="block">Guard (hold)<kbd>S</kbd></button></div>
+  </div>
+  <p class="hint">Keyboard: A/D or arrow keys to move, W to jump, S to guard, J strike, K heavy, L tide special. On a phone, use the buttons.</p>
+</div></section>
+</main>
+
+<footer><div class="wrap">Tidebound is an original practice project. World, courts and duel were made from scratch.</div></footer>
+
+<script>
+(()=>{
+"use strict";
+const $=s=>document.querySelector(s);
+const COURTS=[
+ {id:"squall",name:"Squall",title:"The Stormcallers",tide:"Storm tide",color:"#f2d24b",speed:1.25,power:.9,hp:90,
+  blurb:"Sailors who chase the storm front. They hit first, hit often and never stand still.",special:"Bolt: a very fast shot that is hard to jump."},
+ {id:"rime",name:"Rime",title:"The Stillkeepers",tide:"Still tide",color:"#8fd8f0",speed:1,power:1,hp:100,
+  blurb:"Patient harbour wardens of the frozen north. They slow a fight down until it suits them.",special:"Shard: chills the target and halves their speed."},
+ {id:"abyss",name:"Abyss",title:"The Deepwardens",tide:"Deep tide",color:"#a98bf7",speed:.8,power:1.25,hp:115,
+  blurb:"Divers who work under crushing water. Slow to move, very hard to put down.",special:"Undertow: a heavy orb that drags the target in."},
+ {id:"cinder",name:"Cinder",title:"The Ventborn",tide:"Ember tide",color:"#f5814a",speed:1.05,power:1.1,hp:95,
+  blurb:"Smiths raised beside the boiling vents. Their hits keep hurting after they land.",special:"Scald: a wave that leaves a burn for three seconds."}
+];
+const byId=id=>COURTS.find(c=>c.id===id);
+let chosen="squall";
+
+/* ---------- court cards + picker ---------- */
+$("#courtCards").innerHTML=COURTS.map(c=>`<article class="court" style="--c:${c.color}">
+ <span class="sub">${c.tide}</span><h3>${c.name}</h3><span class="sub">${c.title}</span><p>${c.blurb}</p><p class="sp">${c.special}</p>
+ <div class="stats"><span>Speed</span><div class="bar"><i style="width:${c.speed/1.25*100}%"></i></div>
+ <span>Power</span><div class="bar"><i style="width:${c.power/1.25*100}%"></i></div>
+ <span>Health</span><div class="bar"><i style="width:${c.hp/115*100}%"></i></div></div></article>`).join("");
+function renderPicks(){
+ $("#picks").innerHTML=COURTS.map(c=>`<button type="button" class="pick" id="pick-${c.id}" style="--c:${c.color}" data-id="${c.id}" aria-pressed="${c.id===chosen}">${c.name}<small>${c.tide}</small></button>`).join("");
+}
+renderPicks();
+$("#picks").addEventListener("click",e=>{const b=e.target.closest(".pick");if(!b)return;chosen=b.dataset.id;renderPicks();});
+
+/* ---------- quiz ---------- */
+const QUIZ=[
+ {q:"A rival crew is anchored on your reef. What do you do first?",a:[["Board them before they finish waking up.","squall"],["Wait. They will run out of water before I do.","rime"],["Cut their anchor chain from below.","abyss"],["Light a signal fire they cannot ignore.","cinder"]]},
+ {q:"Which sound do you trust most?",a:[["Thunder a few seconds away.","squall"],["Ice settling at night.","rime"],["The hum of deep water.","abyss"],["A forge that is nearly hot enough.","cinder"]]},
+ {q:"You are losing a duel. What changes?",a:[["I move faster.","squall"],["I stop making mistakes.","rime"],["Nothing. I can take more than they can give.","abyss"],["I make every hit count twice.","cinder"]]},
+ {q:"What would you build on new land?",a:[["A watchtower with a long view.","squall"],["A harbour wall.","rime"],["A diving bell.","abyss"],["A foundry.","cinder"]]}
+];
+let qi=0,tally={};
+function renderQuiz(){
+ const box=$("#quizBox");
+ if(qi<QUIZ.length){const it=QUIZ[qi];
+  box.innerHTML=`<span class="step">Question ${qi+1} of ${QUIZ.length}</span><h3>${it.q}</h3><div class="opts">${it.a.map((a,i)=>`<button type="button" class="opt" id="opt-${i}" data-c="${a[1]}">${a[0]}</button>`).join("")}</div>`;
+ }else{
+  const top=COURTS.slice().sort((a,b)=>(tally[b.id]||0)-(tally[a.id]||0))[0];
+  chosen=top.id;renderPicks();
+  box.innerHTML=`<div class="result" style="--c:${top.color};display:flex;flex-direction:column;gap:1rem"><span class="step">Your court</span><h3>${top.name}, ${top.title}</h3><p>${top.blurb}</p><p>${top.special}</p><div class="row"><a class="btn primary" href="#duel">Fight as ${top.name}</a><button type="button" class="btn" id="quizAgain">Answer again</button></div></div>`;
+ }
+}
+$("#quizBox").addEventListener("click",e=>{
+ const o=e.target.closest(".opt");
+ if(o){tally[o.dataset.c]=(tally[o.dataset.c]||0)+1;qi++;renderQuiz();return;}
+ if(e.target.id==="quizAgain"){qi=0;tally={};renderQuiz();}
+});
+renderQuiz();
+
+/* ---------- hero sea ---------- */
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+(function sea(){
+ const cv=$("#sea"),c=cv.getContext("2d");let W,H;
+ const stars=Array.from({length:90},()=>[Math.random(),Math.random()*.6,Math.random()*1.4+.3]);
+ function size(){const r=cv.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;c.setTransform(d,0,0,d,0,0);}
+ function draw(t){
+  const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,"#06141b");g.addColorStop(.6,"#0b2a36");g.addColorStop(1,"#06141b");
+  c.fillStyle=g;c.fillRect(0,0,W,H);
+  c.fillStyle="#e4f1ee";for(const s of stars){c.globalAlpha=.35+.3*Math.sin(t*.001*s[2]+s[0]*9);c.fillRect(s[0]*W,s[1]*H,s[2],s[2]);}
+  c.globalAlpha=1;
+  const mx=W*.78,my=H*.3,R=Math.min(W,H)*.16,cols=["#f2d24b","#8fd8f0","#a98bf7","#f5814a"];
+  for(let i=0;i<4;i++){const a=i*Math.PI/2+.5,d=R*.16+Math.sin(t*.0006+i)*R*.04;
+   c.save();c.translate(mx+Math.cos(a+Math.PI/4)*d,my+Math.sin(a+Math.PI/4)*d);
+   c.beginPath();c.moveTo(0,0);c.arc(0,0,R,a,a+Math.PI/2);c.closePath();
+   c.fillStyle="#d9d2b4";c.shadowColor=cols[i];c.shadowBlur=26;c.fill();c.restore();}
+  for(let k=0;k<7;k++){const y=H*(.62+k*.06);c.beginPath();
+   for(let x=0;x<=W;x+=12){const yy=y+Math.sin(x*.012+t*.0007*(k+1)+k)*(4+k*1.6);x?c.lineTo(x,yy):c.moveTo(x,yy);}
+   c.strokeStyle=`rgba(143,176,179,${.1+k*.035})`;c.lineWidth=1;c.stroke();}
+ }
+ size();addEventListener("resize",()=>{size();draw(0);});
+ if(reduce)draw(0);else(function loop(t){draw(t);requestAnimationFrame(loop);})(0);
+})();
+
+/* ---------- duel ---------- */
+const cv=$("#arena"),ctx=cv.getContext("2d"),W=960,H=540,GROUND=440;
+(function fit(){const d=Math.min(2,devicePixelRatio||1);cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);})();
+const DIFF=[{react:.34,block:.18,aggro:.5},{react:.2,block:.42,aggro:.72},{react:.11,block:.68,aggro:.9}];
+const ATK={light:{dur:.28,a0:.08,a1:.17,dmg:6,range:78,stun:.22,kb:150},heavy:{dur:.56,a0:.25,a1:.37,dmg:14,range:98,stun:.42,kb:330}};
+const SPEC={squall:{v:950,dmg:10},rime:{v:520,dmg:8},abyss:{v:360,dmg:14},cinder:{v:460,dmg:8}};
+let P,E,shots,sparks,state="idle",stateT=0,round=1,wins=[0,0],timer=60,shake=0,banner="",diff=DIFF[1],last=0;
+const keys={l:0,r:0,up:0,block:0},press={light:0,heavy:0,special:0};
+const newIn=()=>({l:0,r:0,up:0,block:0,light:0,heavy:0,special:0});
+
+function mk(court,x,face){return{court,x,y:GROUND,vx:0,vy:0,face,hp:court.hp,en:0,atk:null,stun:0,slow:0,burn:0,blocking:false,anim:0,flash:0,ko:0,in:newIn(),ai:0,guardT:0};}
+function startMatch(){
+ const pc=byId(chosen);const pool=COURTS.filter(c=>c.id!==chosen);
+ const ec=pool[Math.floor(Math.random()*pool.length)];
+ diff=DIFF[+$("#difficulty").value];wins=[0,0];round=1;
+ P=mk(pc,260,1);E=mk(ec,700,-1);newRound();$("#over").hidden=true;
+ if(!last){last=performance.now();requestAnimationFrame(loop);}
+}
+function newRound(){
+ for(const [f,x,face] of [[P,260,1],[E,700,-1]]){Object.assign(f,mk(f.court,x,face));}
+ shots=[];sparks=[];timer=60;state="intro";stateT=1.4;banner="Fall "+round;
+}
+function onGround(f){return f.y>=GROUND;}
+
+function control(f,o,dt){
+ const i=f.in,c=f.court,sp=250*c.speed*(f.slow>0?.5:1);
+ if(f.ko){f.vx*=.9;return;}
+ if(f.stun>0){f.stun-=dt;f.blocking=false;return;}
+ if(!f.atk)f.face=o.x>=f.x?1:-1;
+ f.blocking=!!i.block&&onGround(f)&&!f.atk;
+ if(f.atk){f.vx*=.8;}
+ else if(f.blocking){f.vx=0;}
+ else{
+  f.vx=(i.r-i.l)*sp;
+  if(i.up&&onGround(f)){f.vy=-640;}
+  if(i.light)f.atk={type:"light",t:0,hit:false};
+  else if(i.heavy)f.atk={type:"heavy",t:0,hit:false};
+  else if(i.special&&f.en>=50){f.en-=50;f.atk={type:"light",t:0,hit:true};
+   shots.push({x:f.x+f.face*30,y:f.y-82,vx:f.face*SPEC[c.id].v,owner:f,id:c.id,color:c.color,life:2.2});}
+ }
+ i.light=i.heavy=i.special=0;
+}
+function physics(f,dt){
+ f.anim+=dt;f.flash=Math.max(0,f.flash-dt);f.slow=Math.max(0,f.slow-dt);
+ if(f.burn>0&&!f.ko){f.burn-=dt;f.hp=Math.max(1,f.hp-2*dt);}
+ f.vy+=1800*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;
+ if(f.y>=GROUND){f.y=GROUND;f.vy=0;}
+ f.x=Math.max(40,Math.min(W-40,f.x));
+ if(f.ko)f.ko+=dt;
+}
+function hurt(o,from,dmg,stun,kb,dir){
+ const guarded=o.blocking&&o.face===-dir;
+ const d=guarded?dmg*.2:dmg;
+ o.hp=Math.max(0,o.hp-d);o.en=Math.min(100,o.en+d*.6+(guarded?4:0));from.en=Math.min(100,from.en+d*1.2+2);
+ o.vx=dir*kb*(guarded?.35:1);
+ if(!guarded){o.stun=stun;o.atk=null;o.flash=.12;shake=Math.max(shake,dmg>10?10:5);}
+ for(let k=0;k<(guarded?5:11);k++)sparks.push({x:o.x-dir*14,y:o.y-85+Math.random()*30,vx:(Math.random()-.3)*dir*320,vy:-Math.random()*300,life:.35,color:guarded?"#e4f1ee":from.court.color});
+ return !guarded;
+}
+function attacks(f,o,dt){
+ if(!f.atk)return;const a=ATK[f.atk.type];f.atk.t+=dt;
+ if(!f.atk.hit&&f.atk.t>=a.a0&&f.atk.t<=a.a1){
+  const dx=(o.x-f.x)*f.face;
+  if(dx>-10&&dx<a.range&&Math.abs(o.y-f.y)<75&&!o.ko){f.atk.hit=true;hurt(o,f,a.dmg*f.court.power,a.stun,a.kb,f.face);}
+ }
+ if(f.atk&&f.atk.t>=a.dur)f.atk=null;
+}
+function updShots(dt){
+ for(const s of shots){s.x+=s.vx*dt;s.life-=dt;
+  const o=s.owner===P?E:P,dir=Math.sign(s.vx);
+  if(s.life>0&&!o.ko&&Math.abs(s.x-o.x)<28&&s.y>o.y-125&&s.y<o.y){
+   s.life=0;const clean=hurt(o,s.owner,SPEC[s.id].dmg*s.owner.court.power,.3,s.id==="abyss"?-420:200,dir);
+   if(clean){if(s.id==="rime")o.slow=2.5;if(s.id==="cinder")o.burn=3;}
+  }
+  if(s.x<-40||s.x>W+40)s.life=0;}
+ shots=shots.filter(s=>s.life>0);
+ for(const p of sparks){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=900*dt;p.life-=dt;}
+ sparks=sparks.filter(p=>p.life>0);
+}
+function ai(f,o,dt){
+ const i=f.in;f.ai-=dt;f.guardT-=dt;
+ i.block=f.guardT>0?1:0;
+ if(f.ai>0)return;f.ai=diff.react*(.7+Math.random()*.6);
+ const dist=Math.abs(o.x-f.x),dir=o.x>f.x?1:-1;i.l=i.r=i.up=0;
+ const threat=(o.atk&&dist<125)||shots.some(s=>s.owner===o&&Math.abs(s.x-f.x)<230&&Math.sign(s.vx)===-dir);
+ if(threat&&Math.random()<diff.block){
+  if(!o.atk&&Math.random()<.45){i.up=1;}else{f.guardT=.32;i.block=1;}
+  return;}
+ if(f.en>=50&&dist>190&&Math.random()<.35+diff.aggro*.3){i.special=1;return;}
+ if(dist>88){
+  if(Math.random()<diff.aggro||dist>330){dir>0?i.r=1:i.l=1;}
+  if(Math.random()<.06)i.up=1;
+ }else{
+  const r=Math.random();
+  if(r<diff.aggro*.6)i.light=1;else if(r<diff.aggro*.85)i.heavy=1;
+  else if(r<.93){dir>0?i.l=1:i.r=1;}
+ }
+}
+function endRound(w){
+ state="roundEnd";stateT=2;
+ if(w===0){wins[0]++;E.ko=E.ko||.01;banner=P.court.name+" takes the fall";}
+ else if(w===1){wins[1]++;P.ko=P.ko||.01;banner=E.court.name+" takes the fall";}
+ else banner="Even fall";
+}
+function update(dt){
+ shake=Math.max(0,shake-dt*40);
+ if(state==="intro"){stateT-=dt;P.anim+=dt;E.anim+=dt;if(stateT<=0){state="fight";banner="";}return;}
+ if(state==="fight"){
+  Object.assign(P.in,keys);P.in.light=press.light;P.in.heavy=press.heavy;P.in.special=press.special;press.light=press.heavy=press.special=0;
+  ai(E,P,dt);
+  control(P,E,dt);control(E,P,dt);attacks(P,E,dt);attacks(E,P,dt);
+  physics(P,dt);physics(E,dt);updShots(dt);
+  if(Math.abs(P.x-E.x)<34&&Math.abs(P.y-E.y)<60){const push=(34-Math.abs(P.x-E.x))/2,s=P.x<E.x?-1:1;P.x+=s*push;E.x-=s*push;}
+  timer-=dt;
+  if(P.hp<=0||E.hp<=0)endRound(P.hp<=0&&E.hp<=0?-1:(E.hp<=0?0:1));
+  else if(timer<=0){timer=0;const a=P.hp/P.court.hp,b=E.hp/E.court.hp;endRound(a===b?-1:(a>b?0:1));}
+  return;}
+ if(state==="roundEnd"){
+  stateT-=dt;physics(P,dt);physics(E,dt);updShots(dt);P.vx*=.9;E.vx*=.9;
+  if(stateT<=0){
+   if(wins[0]>=2||wins[1]>=2){state="over";const won=wins[0]>wins[1];
+    $("#overTitle").textContent=won?"The reef is yours":"The reef is lost";
+    $("#overText").textContent=won?`${P.court.name} beat ${E.court.name}, ${wins[0]} falls to ${wins[1]}.`:`${E.court.name} beat ${P.court.name}, ${wins[1]} falls to ${wins[0]}.`;
+    $("#overBtn").textContent="Duel again";$("#over").hidden=false;}
+   else{round++;newRound();}
+  }}
+}
+
+/* ---------- drawing ---------- */
+function bg(t){
+ const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,"#04101a");g.addColorStop(.7,"#0d3040");g.addColorStop(1,"#081c26");
+ ctx.fillStyle=g;ctx.fillRect(-20,-20,W+40,H+40);
+ const cols=["#f2d24b","#8fd8f0","#a98bf7","#f5814a"];
+ for(let i=0;i<4;i++){ctx.save();ctx.translate(180+i*200,90+Math.sin(t+i*1.7)*6+(i%2)*26);ctx.rotate(i*.9+.3);
+  ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,34,0,Math.PI/2);ctx.closePath();ctx.fillStyle="#d9d2b4";ctx.shadowColor=cols[i];ctx.shadowBlur=22;ctx.fill();ctx.restore();}
+ for(let k=0;k<5;k++){const y=300+k*24;ctx.beginPath();for(let x=0;x<=W;x+=16){const yy=y+Math.sin(x*.013+t*(.6+k*.2)+k)*(3+k);x?ctx.lineTo(x,yy):ctx.moveTo(x,yy);}
+  ctx.strokeStyle=`rgba(143,176,179,${.08+k*.03})`;ctx.lineWidth=1;ctx.stroke();}
+ ctx.fillStyle="#0a1a22";ctx.beginPath();ctx.moveTo(0,GROUND+6);
+ for(let x=0;x<=W;x+=40)ctx.lineTo(x,GROUND+4+Math.sin(x*.05)*3);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+ ctx.strokeStyle="#1d3f4d";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,GROUND+5);ctx.lineTo(W,GROUND+5);ctx.stroke();
+ ctx.fillStyle="#12303b";for(let x=30;x<W;x+=90){ctx.beginPath();ctx.ellipse(x+Math.sin(x)*20,GROUND+40+(x%3)*14,26,7,0,0,7);ctx.fill();}
+}
+function drawFighter(f){
+ const col=f.flash>0?"#ffffff":f.court.color,body=f.flash>0?"#ffffff":"#16404f";
+ ctx.save();ctx.translate(f.x,f.y);
+ ctx.fillStyle="rgba(0,0,0,.35)";ctx.beginPath();ctx.ellipse(0,GROUND-f.y+6,30,6,0,0,7);ctx.fill();
+ ctx.scale(f.face,1);
+ if(f.ko){ctx.translate(0,-8);ctx.rotate(-Math.PI/2*Math.min(1,f.ko*3));}
+ const moving=Math.abs(f.vx)>20&&onGround(f),sw=moving?Math.sin(f.anim*13):0,air=!onGround(f);
+ const bob=moving?0:Math.sin(f.anim*3)*1.5,crouch=f.blocking?8:0;
+ ctx.lineCap="round";ctx.lineJoin="round";
+ ctx.strokeStyle=body;ctx.lineWidth=9;
+ ctx.beginPath();ctx.moveTo(-5,-48+crouch);ctx.lineTo(-10-sw*15,air?-14:0);ctx.moveTo(5,-48+crouch);ctx.lineTo(12+sw*15,air?-20:0);ctx.stroke();
+ ctx.translate(0,bob+crouch);
+ ctx.fillStyle=body;ctx.beginPath();ctx.moveTo(-17,-44);ctx.lineTo(17,-44);ctx.lineTo(12,-102);ctx.lineTo(-12,-102);ctx.closePath();ctx.fill();
+ ctx.fillStyle=col;ctx.fillRect(-15,-66,30,6);ctx.beginPath();ctx.moveTo(2,-102);ctx.lineTo(12,-102);ctx.lineTo(15,-60);ctx.lineTo(8,-60);ctx.closePath();ctx.fill();
+ ctx.fillStyle="#d8c7ae";ctx.beginPath();ctx.arc(0,-116,13,0,7);ctx.fill();
+ ctx.fillStyle=col;ctx.beginPath();ctx.arc(0,-119,13.5,Math.PI,0);ctx.fill();ctx.fillRect(-14,-121,24,4);
+ let reach=0,up=0;
+ if(f.atk){const a=ATK[f.atk.type],p=Math.min(1,f.atk.t/a.dur);reach=Math.sin(p*Math.PI)*(f.atk.type==="heavy"?66:46);up=f.atk.type==="heavy"?-14*Math.sin(p*Math.PI):0;}
+ ctx.strokeStyle=body;ctx.lineWidth=8;ctx.beginPath();
+ if(f.blocking){ctx.moveTo(8,-94);ctx.lineTo(24,-82);ctx.lineTo(20,-104);}
+ else{ctx.moveTo(8,-94);ctx.lineTo(20+reach*.5,-80+up*.5);ctx.lineTo(26+reach,-86+up);}
+ ctx.stroke();
+ if(f.atk&&reach>12){ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=16;ctx.beginPath();ctx.arc(28+reach,-86+up,f.atk.type==="heavy"?11:7,0,7);ctx.fill();ctx.shadowBlur=0;}
+ if(f.blocking){ctx.strokeStyle=col;ctx.lineWidth=4;ctx.globalAlpha=.85;ctx.beginPath();ctx.arc(8,-78,44,-1.1,1.1);ctx.stroke();ctx.globalAlpha=1;}
+ ctx.restore();
+ if(f.slow>0||f.burn>0){ctx.fillStyle=f.slow>0?"#8fd8f0":"#f5814a";ctx.font="600 13px Instrument Sans, sans-serif";ctx.textAlign="center";ctx.fillText(f.slow>0?"CHILLED":"BURNING",f.x,f.y-142);}
+}
+function hud(){
+ const bw=360;
+ const one=(f,x,flip,w)=>{
+  ctx.fillStyle="#0c222c";ctx.fillRect(x,28,bw,18);
+  const r=Math.max(0,f.hp/f.court.hp);ctx.fillStyle=f.court.color;ctx.fillRect(flip?x+bw*(1-r):x,28,bw*r,18);
+  ctx.strokeStyle="#1d3f4d";ctx.lineWidth=2;ctx.strokeRect(x,28,bw,18);
+  ctx.fillStyle="#0c222c";ctx.fillRect(flip?x+bw-180:x,52,180,7);
+  ctx.fillStyle=f.en>=50?"#ecc766":"#8fb0b3";const e=180*f.en/100;ctx.fillRect(flip?x+bw-e:x,52,e,7);
+  ctx.fillStyle="#e4f1ee";ctx.font="800 18px Bricolage Grotesque, sans-serif";ctx.textAlign=flip?"right":"left";
+  ctx.fillText(f.court.name.toUpperCase()+(f===P?"  (you)":""),flip?x+bw:x,20);
+  for(let k=0;k<2;k++){ctx.beginPath();ctx.arc(flip?x+bw-8-k*20:x+8+k*20,76,6,0,7);ctx.fillStyle=k<w?"#ecc766":"#0c222c";ctx.fill();ctx.strokeStyle="#1d3f4d";ctx.stroke();}
+ };
+ one(P,40,false,wins[0]);one(E,W-40-bw,true,wins[1]);
+ ctx.fillStyle="#e4f1ee";ctx.font="800 34px Bricolage Grotesque, sans-serif";ctx.textAlign="center";ctx.fillText(String(Math.ceil(timer)),W/2,48);
+ if(banner){ctx.font="800 58px Bricolage Grotesque, sans-serif";ctx.fillStyle="rgba(3,12,17,.6)";ctx.fillRect(0,200,W,96);ctx.fillStyle="#ecc766";ctx.fillText(banner.toUpperCase(),W/2,268);}
+}
+function draw(t){
+ ctx.save();if(shake>0&&!reduce)ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
+ bg(t);
+ if(P){
+  drawFighter(E);drawFighter(P);
+  for(const s of shots){ctx.save();ctx.fillStyle=s.color;ctx.shadowColor=s.color;ctx.shadowBlur=18;ctx.beginPath();
+   if(s.id==="squall"){ctx.fillRect(s.x-22,s.y-3,44,6);}
+   else if(s.id==="rime"){ctx.moveTo(s.x+Math.sign(s.vx)*18,s.y);ctx.lineTo(s.x-Math.sign(s.vx)*12,s.y-9);ctx.lineTo(s.x-Math.sign(s.vx)*12,s.y+9);ctx.closePath();ctx.fill();}
+   else if(s.id==="abyss"){ctx.arc(s.x,s.y,15+Math.sin(t*14)*2,0,7);ctx.fill();}
+   else{ctx.ellipse(s.x,s.y+10,14,26,0,0,7);ctx.fill();}
+   ctx.restore();}
+  for(const p of sparks){ctx.globalAlpha=Math.max(0,p.life/.35);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,4,4);}
+  ctx.globalAlpha=1;
+ }
+ ctx.restore();
+ if(P)hud();
+}
+function loop(now){
+ const dt=Math.min(.033,(now-last)/1000);last=now;
+ if(state!=="over"&&state!=="idle")update(dt);
+ draw(now/1000);requestAnimationFrame(loop);
+}
+draw(0);
+
+/* ---------- input ---------- */
+const MAP={a:"l",arrowleft:"l",d:"r",arrowright:"r",w:"up",arrowup:"up"," ":"up",s:"block",arrowdown:"block",j:"light",k:"heavy",l:"special"};
+function set(k,v){if(k in keys)keys[k]=v;else if(v)press[k]=1;}
+addEventListener("keydown",e=>{const k=MAP[e.key.toLowerCase()];if(!k||e.target.tagName==="SELECT")return;
+ if(state==="fight"||state==="intro")e.preventDefault();if(!e.repeat)set(k,1);});
+addEventListener("keyup",e=>{const k=MAP[e.key.toLowerCase()];if(k)set(k,0);});
+addEventListener("blur",()=>{for(const k in keys)keys[k]=0;});
+for(const b of document.querySelectorAll("#pad button")){
+ const k=b.dataset.k;b.id="pad-"+k;
+ const down=e=>{e.preventDefault();b.classList.add("on");set(k,1);try{b.setPointerCapture(e.pointerId);}catch(_){}};
+ const up=()=>{b.classList.remove("on");set(k,0);};
+ b.addEventListener("pointerdown",down);b.addEventListener("pointerup",up);b.addEventListener("pointercancel",up);b.addEventListener("lostpointercapture",up);
+ b.addEventListener("contextmenu",e=>e.preventDefault());
+}
+$("#startBtn").addEventListener("click",startMatch);
+$("#overBtn").addEventListener("click",startMatch);
+})();
+</script>
