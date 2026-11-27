@@ -3,7 +3,7 @@
 
 <p align="center">
   <a href="https://github.com/TTech-spec"><img src="https://img.shields.io/badge/GitHub-TTech--spec-181717?logo=github" alt="GitHub"></a>
-  <a href="YOUR_PORTFOLIO_LINK"><img src="https://img.shields.io/badge/Portfolio-Visit-ecc766" alt="Portfolio"></a>
+  <a href="https://my-portfolio-self-nine-52.vercel.app/"><img src="https://img.shields.io/badge/Portfolio-Visit-ecc766" alt="Portfolio"></a>
   <a href="YOUR_LINKEDIN_LINK"><img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?logo=linkedin" alt="LinkedIn"></a>
   <a href="mailto:YOUR_PUBLIC_EMAIL"><img src="https://img.shields.io/badge/Email-Say%20hi-EA4335?logo=gmail&logoColor=white" alt="Email"></a>
 </p>
